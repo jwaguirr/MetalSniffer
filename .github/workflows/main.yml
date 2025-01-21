@@ -35,8 +35,14 @@ jobs:
       - name: Install npcap dependencies (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
-          choco install npcap -y
-          choco install npcap-sdk -y
+          # Download Npcap installer
+          curl -L "https://npcap.com/dist/npcap-1.75.exe" -o npcap-installer.exe
+          # Install Npcap silently with default settings
+          ./npcap-installer.exe /S
+          # Download Npcap SDK
+          curl -L "https://npcap.com/dist/npcap-sdk-1.13.zip" -o npcap-sdk.zip
+          # Extract SDK to Program Files
+          Expand-Archive -Path npcap-sdk.zip -DestinationPath "C:\Program Files\Npcap-SDK"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
