@@ -1,0 +1,46 @@
+name: Build Tauri App
+
+on:
+  push:
+    branches:
+      - releases
+  pull_request:
+    branches:
+      - releases
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Install Tauri Dependencies
+        run: |
+          npm install
+          cargo install tauri-cli --locked
+
+      - name: Build Tauri App
+        run: npm run tauri build
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tauri-app-${{ matrix.platform }}
+          path: src-tauri/target/release/bundle/
