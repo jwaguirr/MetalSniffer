@@ -24,7 +24,7 @@ struct CaptureState {
 
 fn format_timeval(tv: libc::timeval) -> String {
     // Extract seconds and microseconds
-    let local_time: DateTime<Local> = DateTime::from_timestamp(tv.tv_sec, (tv.tv_usec * 1000) as u32)
+    let local_time: DateTime<Local> = DateTime::from_timestamp(tv.tv_sec.into(), (tv.tv_usec * 1000) as u32)
     .expect("Invalid timestamp")
     .into();
 
