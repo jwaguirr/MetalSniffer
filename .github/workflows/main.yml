@@ -1,4 +1,18 @@
+name: 'Build Tauri App'
 
+on:
+  push:
+    branches:
+      - releases
+  workflow_dispatch:
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
           - platform: 'macos-latest' # for Arm-based Macs (M1 and above).
             args: '--target aarch64-apple-darwin'
           - platform: 'macos-latest' # for Intel-based Macs.
