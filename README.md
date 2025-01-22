@@ -43,7 +43,7 @@ A key feature of Metal Sniffer is its ability to automatically group packets by 
 
 1. **Download the App**
 
-   - [Download Metal Sniffer (DMG)](https://github.com/your-repo/MetalSniffer/releases/latest)
+   - [Download Metal Sniffer (DMG)]([https://github.com/your-repo/MetalSniffer/releases/latest](https://github.com/jwaguirr/MetalSniffer/releases/tag/app-v0.1.0))
 
 2. **Run the App**
 
@@ -66,7 +66,7 @@ A key feature of Metal Sniffer is its ability to automatically group packets by 
 ## Notes for Users
 
 - This is my **first miniature Rust project**, created to deepen my familiarity with the language. Metal Sniffer serves as both a practical tool and a learning experience.
-- If you encounter any issues, feel free to open a [GitHub issue](https://github.com/your-repo/MetalSniffer/issues).
+- If you encounter any issues, feel free to open a [GitHub issue](https://github.com/jwaguirr/MetalSniffer/issues).
 
 ---
 
@@ -75,6 +75,8 @@ A key feature of Metal Sniffer is its ability to automatically group packets by 
 - Add support for Windows and Linux platforms.
 - Introduce advanced filtering capabilities for specific packet types.
 - Enhance the UI for an even more user-friendly experience.
+- I want to enhance application-layer recognition by adding support for identifying more protocols based on port numbers and traffic patterns.
+- I would also like to decode the payload to identify cases where parts are UTF-8 encoded.
 
 ---
 
@@ -87,13 +89,6 @@ Contributions are welcome! If you have ideas for improvements or bug fixes, feel
 ## License
 
 Metal Sniffer is released under the [MIT License](https://opensource.org/licenses/MIT).
-
----
-
-## Acknowledgments
-
-- [Tauri](https://tauri.app/) for providing an amazing framework for lightweight desktop apps.
-- The Rust community for their fantastic resources and support.
 
 ---
 
