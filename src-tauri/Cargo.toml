@@ -24,7 +24,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rand = "0.8"
 thiserror = "1"
-pcap = "2.2.0"
+pcap = { version = "2.2.0", features = ["static"] }
 pnet = "0.35.0"
 chrono = "0.4"
 libc = "0.2.169"
