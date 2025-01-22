@@ -1,18 +1,4 @@
-name: 'Build Tauri App'
 
-on:
-  push:
-    branches:
-      - releases
-  workflow_dispatch:
-jobs:
-  publish-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
           - platform: 'macos-latest' # for Arm-based Macs (M1 and above).
             args: '--target aarch64-apple-darwin'
           - platform: 'macos-latest' # for Intel-based Macs.
@@ -31,7 +17,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libpcap-dev
-
       - name: Install npcap dependencies (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
@@ -39,11 +24,20 @@ jobs:
           curl -L "https://npcap.com/dist/npcap-1.75.exe" -o npcap-installer.exe
           # Install Npcap silently with default settings
           ./npcap-installer.exe /S
+          
           # Download Npcap SDK
           curl -L "https://npcap.com/dist/npcap-sdk-1.13.zip" -o npcap-sdk.zip
-          # Extract SDK to Program Files
-          Expand-Archive -Path npcap-sdk.zip -DestinationPath "C:\Program Files\Npcap-SDK"
-
+          # Create SDK directory
+          mkdir "C:\Npcap-sdk"
+          # Extract SDK
+          Expand-Archive -Path npcap-sdk.zip -DestinationPath "C:\Npcap-sdk"
+          
+          # Add SDK path to environment variables for the linker
+          echo "NPCAP_SDK=C:\Npcap-sdk" >> $env:GITHUB_ENV
+          echo "LIB=C:\Npcap-sdk\Lib\x64;$env:LIB" >> $env:GITHUB_ENV
+          
+          # Verify the Packet.lib exists
+          dir "C:\Npcap-sdk\Lib\x64\Packet.lib"
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
