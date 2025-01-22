@@ -1,19 +1,4 @@
-name: 'Build Tauri App'
 
-on:
-  push:
-    branches:
-      - releases
-  workflow_dispatch:
-
-jobs:
-  publish-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
           - platform: 'macos-latest' # for Arm-based Macs (M1 and above).
             args: '--target aarch64-apple-darwin'
           - platform: 'macos-latest' # for Intel-based Macs.
@@ -27,14 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Ubuntu-specific dependencies
       - name: Install dependencies (Ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libpcap-dev
-
-      # Windows-specific steps
       - name: Install npcap dependencies (Windows only)
         if: matrix.platform == 'windows-latest'
         run: |
@@ -42,42 +24,39 @@ jobs:
           curl -L "https://npcap.com/dist/npcap-1.75.exe" -o npcap-installer.exe
           # Install Npcap silently with default settings
           ./npcap-installer.exe /S
+          
           # Download Npcap SDK
           curl -L "https://npcap.com/dist/npcap-sdk-1.13.zip" -o npcap-sdk.zip
-          # Extract SDK to Program Files
-          Expand-Archive -Path npcap-sdk.zip -DestinationPath "C:\\Program Files\\Npcap-SDK"
-
-      - name: Include wpcap.dll and packet.dll (Windows only)
-        if: matrix.platform == 'windows-latest'
-        run: |
-          mkdir -p src-tauri/resources/windows
-          curl -L -o src-tauri/resources/windows/wpcap.dll https://github.com/nmap/npcap/releases/download/v1.75/wpcap.dll
-          curl -L -o src-tauri/resources/windows/packet.dll https://github.com/nmap/npcap/releases/download/v1.75/packet.dll
-
-      # Setup Node.js
+          # Create SDK directory
+          mkdir "C:\Npcap-sdk"
+          # Extract SDK
+          Expand-Archive -Path npcap-sdk.zip -DestinationPath "C:\Npcap-sdk"
+          
+          # Add SDK path to environment variables for the linker
+          echo "NPCAP_SDK=C:\Npcap-sdk" >> $env:GITHUB_ENV
+          echo "LIB=C:\Npcap-sdk\Lib\x64;$env:LIB" >> $env:GITHUB_ENV
+          
+          # Verify the Packet.lib exists
+          dir "C:\Npcap-sdk\Lib\x64\Packet.lib"
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: 'yarn'
 
-      # Install Rust
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      # Cache Rust dependencies
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
 
-      # Install frontend dependencies
       - name: Install frontend dependencies
         run: yarn install
 
-      # Build the Tauri app
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
